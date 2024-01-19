@@ -1,0 +1,17 @@
+//Autenticação de loja
+POST http://localhost:3333/sessions/employee
+Content-Type: application/json
+
+{
+    "email":"teste@email.com",
+    "password": "1234"
+}
+###
+//Autenticação de app.
+POST http://localhost:3333/sessions/custumer
+Content-Type: application/json
+
+{
+    "email":"teste@email.com",
+    "password": "1234"
+}

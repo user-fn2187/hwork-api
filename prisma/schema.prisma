@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Worker {
+  idWorker    Int       @id @default(autoincrement())
+  fullName    String
+  phoneNumber String?
+  document    String
+  photo       String?
+  limit       Float?
+  fullAccess  Boolean   @default(false)
+  idCustomer  Int?
+  Customer    Customer? @relation(fields: [idCustomer], references: [idCustomer])
+  Sales       Sale[]
+
+  @@map("Workers")
+}
+
+model Customer {
+  idCustomer   Int                @id @default(autoincrement())
+  name         String
+  lastName     String?
+  mainPicture  String?
+  email        String             @unique
+  password     String
+  document     String
+  phoneNumber  String?
+  idAddress    Int?
+  Address      Address?           @relation(fields: [idAddress], references: [idAddress])
+  Workers      Worker[]
+  Sales        Sale[]
+  companyCustomers CompanyCustomers[]
+
+  @@map("Customers")
+}
+
+model Address {
+  idAddress       Int        @id @default(autoincrement())
+  zipCode         String?
+  publicPlace     String?
+  number          Int?
+  neighborhood    String?
+  complement      String?
+  referencePoint  String?
+  uf              String?
+  latitude        String?
+  longitude       String?
+  idCity          Int?
+  City            City?      @relation(fields: [idCity], references: [idCity])
+  Customers       Customer[]
+  Company         Company[]
+  @@map("Addresses")
+}
+
+model City {
+  idCity    Int        @id @default(autoincrement())
+  name      String
+  Addresses Address[]
+
+  @@map("Cities")
+}
+
+model Sale {
+  idSale       Int        @id @default(autoincrement())
+  totalPrice   Float
+  saleTime     DateTime
+  description  String?
+  idCustomer   Int?
+  Customer     Customer?  @relation(fields: [idCustomer], references: [idCustomer])
+  idWorker     Int?
+  Worker       Worker?    @relation(fields: [idWorker], references: [idWorker])
+  SaleProducts SaleProduct[]
+
+  @@map("Sales")
+}
+
+model SaleProduct {
+  idSaleProduct Int     @id @default(autoincrement())
+  idSale        Int
+  idProduct     Int
+  Sale          Sale    @relation(fields: [idSale], references: [idSale])
+  Product       Product @relation(fields: [idProduct], references: [idProduct])
+
+  @@map("saleProducts")
+}
+
+model Product {
+  idProduct      Int           @id @default(autoincrement())
+  name           String
+  value          Float
+  weight         Float?
+  code           String?
+  description    String?
+  idCompany      Int?
+  Company        Company?      @relation(fields: [idCompany], references: [idCompany])
+  SaleProducts   SaleProduct[]
+
+  @@map("Products")
+}
+
+model Company {
+  idCompany         Int                @id @default(autoincrement())
+  name              String
+  idAddress         Int?
+  Address           Address?           @relation(fields: [idAddress], references: [idAddress])
+  documentNumber    String?
+  phoneNumber       String?
+  corporateName     String?
+  tradeName         String?
+  Products          Product[]
+  CompanyCustomers  CompanyCustomers[]
+  CompanyEmployees  CompanyEmployee[]
+
+  @@map("Companies")
+}
+
+model CompanyEmployee {
+  idCompanyUsersInt  Int       @id @default(autoincrement())
+  idCompany         Int
+  idEmployee        Int
+  Company           Company   @relation(fields: [idCompany], references: [idCompany])
+  Employee          Employee  @relation(fields: [idEmployee], references: [idEmployee])
+
+  @@map("companyEmployee")
+}
+
+model Employee {
+  idEmployee    Int                @id @default(autoincrement())
+  idRole        Int?
+  Role          Role?              @relation(fields: [idRole], references: [idRole])
+  name          String
+  lastName      String?
+  mainPicture   String?
+  email         String             @unique
+  password      String
+  document      String
+  phoneNumber   String?
+  CompanyEmployees CompanyEmployee[]
+
+  @@map("Employees")
+}
+
+model Role {
+  idRole   Int          @id @default(autoincrement())
+  title    String
+  alias    String?
+  Employees Employee[]
+
+  @@map("Roles")
+}
+
+// Tabela faltante: CompanyCustomers
+model CompanyCustomers {
+  idCompanyCustomers Int       @id @default(autoincrement())
+  idCompany         Int
+  idCustomer        Int
+  Company           Company   @relation(fields: [idCompany], references: [idCompany])
+  Customer          Customer  @relation(fields: [idCustomer], references: [idCustomer])
+
+  @@map("companyCustomers")
+}
